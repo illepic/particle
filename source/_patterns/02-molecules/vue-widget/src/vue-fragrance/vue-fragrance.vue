@@ -15,7 +15,7 @@
           <div
             v-for="fragrance in category.fragrances"
             :key="fragrance.id"
-            :style="{backgroundImage: `url(${imgBase.spectrum}/${ fragrance.img.spectrum})`}"
+            :style="{backgroundImage: `url(${imgBase}${ fragrance.img.spectrum})`}"
             class="spectrum-category__image h-100"
             :class="{highlighted: fragrance.id === highlightedId, chosen: fragrance.id === chosenId}"
             @mouseover="highlightedId = fragrance.id"
@@ -48,71 +48,39 @@
     <div class="combiner">
       <h2 class="text-center my-3">Step 2. Choose your combination</h2>
       <div class="row justify-content-center">
-        <div class="25">
-          <form>
-            <div class="form-row align-items-center">
-              <div class="col-auto my-1">Make it</div>
-              <div class="col-auto my-1">
-                <label
-                  class="mr-sm-2 sr-only"
-                  for="inlineFormCustomSelect"
-                >Select companion fragrance</label>
-                <select
-                  id="inlineFormCustomSelect"
-                  v-model="companion"
-                  class="custom-select mr-2"
-                >
-                  <option
-                    selected
-                    value="warmer"
-                  >Warmer</option>
-                  <option value="fresher">Fresher</option>
-                </select>
-              </div>
+        <form>
+          <div class="form-row align-items-center">
+            <div class="col-auto my-1">Make it</div>
+            <div class="col-auto my-1">
+              <label
+                class="mr-sm-2 sr-only"
+                for="inlineFormCustomSelect"
+              >Select companion fragrance</label>
+              <select
+                id="inlineFormCustomSelect"
+                v-model="companion"
+                class="custom-select mr-2"
+              >
+                <option
+                  selected
+                  value="warmer"
+                >Warmer</option>
+                <option value="fresher">Fresher</option>
+              </select>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
       <div class="row justify-content-center no-gutters mt-3">
-        <div class="fragrance fragrance--combiner col-auto text-center">
-          <div>
-            <img
-              :src="`${imgBase.combiner}/${chosenFrag.img.combiner}`"
-              :alt="chosenFrag.names.short"
-            >
-          </div>
-          <p class="text-uppercase bold"><strong>{{ chosenFrag.names.long }}</strong></p>
-          <p class="text-capitalize">{{ chosenFrag.cat }}</p>
-          <p>
-            <span
-              v-for="(size, cost) in chosenFrag.price"
-              :key="chosenFrag.id + size"
-              class="fragrance__size-price"
-            >
-              ${{ cost }} {{ size }}ml
-            </span>
-          </p>
-          <button class="btn btn-primary text-uppercase">Shop now</button>
+        <div class="fragrance-slot col-auto ">
+          <fragrance-product
+            :product="chosenFrag"
+          />
         </div>
-        <div class="fragrance fragrance--combiner col-auto text-center">
-          <div>
-            <img
-              :src="`${imgBase.combiner}/${companionFrag.img.combiner}`"
-              :alt="companionFrag.names.short"
-            >
-          </div>
-          <p class="text-uppercase bold"><strong>{{ companionFrag.names.long }}</strong></p>
-          <p class="text-capitalize">{{ companionFrag.cat }}</p>
-          <p>
-            <span
-              v-for="(size, cost) in companionFrag.price"
-              :key="companionFrag.id + size"
-              class="fragrance__size-price"
-            >
-              ${{ cost }} {{ size }}ml
-            </span>
-          </p>
-          <button class="btn btn-primary text-uppercase">Shop now</button>
+        <div class="fragrance-slit col-auto">
+          <fragrance-product
+            :product="companionFrag"
+          />
         </div>
       </div>
     </div>
@@ -121,28 +89,20 @@
 </template>
 
 <script>
-import fragrances, { fallbackFrag } from './fragrances';
+import { fragrances, categories } from './parse';
+
+import FragranceProduct from './fragrance-product.vue';
 
 export default {
   name: 'VueFragranceCombining',
+  components: {
+    FragranceProduct,
+  },
   data() {
     return {
       fragrances,
-      fallbackFrag,
-      categories: [
-        'citrus',
-        'fruity',
-        'light floral',
-        'floral',
-        'spicy',
-        'woody',
-      ],
-      imgBase: {
-        combiner:
-          'https://www.jomalone.com/media/export/cms/fragrancecombiner/product_combiner_images',
-        spectrum:
-          'https://www.jomalone.com/media/export/cms/fragrancecombiner/spectrum_images',
-      },
+      categories,
+      imgBase: 'https://www.jomalone.com',
       companion: 'warmer',
       highlightedId: null,
       chosenId: null,
@@ -174,10 +134,8 @@ export default {
       return this.starters.find(({ id }) => id === this.chosenId);
     },
     companionFrag() {
-      return (
-        this.fragrances.find(
-          ({ id }) => this.chosenFrag.companion[this.companion] === id
-        ) || this.fallbackFrag
+      return this.fragrances.find(
+        ({ id }) => this.chosenFrag.companion[this.companion] === id
       );
     },
   },
@@ -222,8 +180,5 @@ export default {
 .highlighted-category {
   background-color: theme-color(dark);
   color: theme-color(light);
-}
-.fragrance__size-price + .fragrance__size-price:before {
-  content: '/ ';
 }
 </style>
