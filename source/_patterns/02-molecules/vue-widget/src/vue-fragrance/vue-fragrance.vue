@@ -15,18 +15,18 @@
           <div
             v-for="fragrance in category.fragrances"
             :key="fragrance.id"
-            :style="{backgroundImage: `url(${imgUrl.spectrum}/${ fragrance.img.spectrum})`}"
+            :style="{backgroundImage: `url(${imgBase.spectrum}/${ fragrance.img.spectrum})`}"
             class="spectrum-category__image h-100"
-            :class="{highlighted: fragrance.isHighlighted, chosen: fragrance.isChosen}"
-            @mouseover="highlight(fragrance)"
-            @click="choose(fragrance)"
+            :class="{highlighted: fragrance.id === highlightedId, chosen: fragrance.id === chosenId}"
+            @mouseover="highlightedId = fragrance.id"
+            @click="choose(fragrance.id)"
           />
         </div>
 
         <div
           class="spectrum-category__category border border-secondary"
-          :class="{'highlighted-category': category.isCatHighlighted}"
-          @mouseover="highlight(category.fragrances[0])"
+          :class="{'highlighted-category': category.category === highlightedCat}"
+          @mouseover="highlightedId = category.fragrances[0].id"
         >
           {{ category.category }}
         </div>
@@ -35,9 +35,9 @@
           <li
             v-for="fragrance in category.fragrances"
             :key="fragrance.id"
-            :class="{highlighted: fragrance.isHighlighted, chosen: fragrance.isChosen}"
-            @mouseover="highlight(fragrance)"
-            @click="choose(fragrance)"
+            :class="{highlighted: fragrance.id === highlightedId, chosen: fragrance.id === chosenId}"
+            @mouseover="highlightedId = fragrance.id"
+            @click="choose(fragrance.id)"
           >
             {{ fragrance.names.short }}
           </li>
@@ -77,16 +77,16 @@
         <div class="fragrance fragrance--combiner col-auto text-center">
           <div>
             <img
-              :src="`${imgUrl.combiner}/${chosen.img.combiner}`"
-              :alt="chosen.names.short"
+              :src="`${imgBase.combiner}/${chosenFrag.img.combiner}`"
+              :alt="chosenFrag.names.short"
             >
           </div>
-          <p class="text-uppercase bold"><strong>{{ chosen.names.long }}</strong></p>
-          <p class="text-capitalize">{{ chosen.cat }}</p>
+          <p class="text-uppercase bold"><strong>{{ chosenFrag.names.long }}</strong></p>
+          <p class="text-capitalize">{{ chosenFrag.cat }}</p>
           <p>
             <span
-              v-for="(size, cost) in chosen.price"
-              :key="chosen.id + size"
+              v-for="(size, cost) in chosenFrag.price"
+              :key="chosenFrag.id + size"
               class="fragrance__size-price"
             >
               ${{ cost }} {{ size }}ml
@@ -97,7 +97,7 @@
         <div class="fragrance fragrance--combiner col-auto text-center">
           <div>
             <img
-              :src="`${imgUrl.combiner}/${companionFrag.img.combiner}`"
+              :src="`${imgBase.combiner}/${companionFrag.img.combiner}`"
               :alt="companionFrag.names.short"
             >
           </div>
@@ -128,6 +128,7 @@ export default {
   data() {
     return {
       fragrances,
+      fallbackFrag,
       categories: [
         'citrus',
         'fruity',
@@ -136,13 +137,15 @@ export default {
         'spicy',
         'woody',
       ],
-      imgUrl: {
+      imgBase: {
         combiner:
           'https://www.jomalone.com/media/export/cms/fragrancecombiner/product_combiner_images',
         spectrum:
           'https://www.jomalone.com/media/export/cms/fragrancecombiner/spectrum_images',
       },
       companion: 'warmer',
+      highlightedId: null,
+      chosenId: null,
     };
   },
   computed: {
@@ -155,7 +158,6 @@ export default {
           // For each category, generate object with category and frags
           .map(category => ({
             category,
-            isCatHighlighted: false,
             fragrances: this.starters
               .filter(({ cat: fragCategory }) => category === fragCategory)
               // Sort order of frags within cat
@@ -163,40 +165,31 @@ export default {
           }))
           // Only show categories which have fragrances
           .filter(category => !!category.fragrances.length)
-          // Highlight category if it contains any highlighted frag
-          .map(
-            category =>
-              category.fragrances.some(frag => frag.isHighlighted)
-                ? { ...category, isCatHighlighted: true }
-                : category
-          )
       );
     },
-    chosen() {
-      return this.starters.find(frag => frag.isChosen);
+    highlightedCat() {
+      return this.starters.find(({ id }) => id === this.highlightedId).cat;
+    },
+    chosenFrag() {
+      return this.starters.find(({ id }) => id === this.chosenId);
     },
     companionFrag() {
       return (
         this.fragrances.find(
-          ({ id }) => this.chosen.companion[this.companion] === id
-        ) || fallbackFrag
+          ({ id }) => this.chosenFrag.companion[this.companion] === id
+        ) || this.fallbackFrag
       );
     },
   },
+  created() {
+    const first = this.spectrum[0].fragrances[0].id;
+    this.highlightedId = first;
+    this.chosenId = first;
+  },
   methods: {
-    // Choose a frag, only one at a time
-    highlight(highlightedFrag) {
-      this.fragrances = this.fragrances.map(frag => ({
-        ...frag,
-        isHighlighted: frag.id === highlightedFrag.id,
-      }));
-    },
-    choose(chosenFrag) {
+    choose(id) {
       this.companion = 'warmer';
-      this.fragrances = this.fragrances.map(frag => ({
-        ...frag,
-        isChosen: frag.id === chosenFrag.id,
-      }));
+      this.chosenId = id;
     },
   },
 };

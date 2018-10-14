@@ -45,8 +45,6 @@ export default [
       fresher: 10066,
     },
     isStarter: true,
-    isHighlighted: true,
-    isChosen: true,
   },
   {
     id: 9900,
@@ -69,8 +67,6 @@ export default [
       fresher: 12553,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
   {
     id: 10041,
@@ -93,8 +89,6 @@ export default [
       fresher: 10101,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
   {
     id: 10066,
@@ -117,8 +111,6 @@ export default [
       fresher: 15968,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
   {
     id: 12553,
@@ -141,8 +133,6 @@ export default [
       fresher: 18848,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
   {
     id: 27028,
@@ -165,8 +155,6 @@ export default [
       fresher: 10041,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
   {
     id: 15968,
@@ -189,7 +177,5 @@ export default [
       fresher: 10041,
     },
     isStarter: true,
-    isHighlighted: false,
-    isChosen: false,
   },
 ];
