@@ -48,7 +48,6 @@ const allProducts = pageData.catalog.categories.reduce((acc, cat) => {
 
   return acc;
 }, []);
-console.log(allProducts);
 
 export const fragrances = Object.values(drupalData).map(
   (
