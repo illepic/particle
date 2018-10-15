@@ -1,6 +1,11 @@
+/**
+ * Parse the "original" data that is in the page to extract product info
+ */
+
 import pageData from './original-data/page_data';
 import drupalData from './original-data/drupal_settings';
 
+// Products in this cat show in "spectrum"
 const COMBO_CAT = 'CAT3805';
 
 // Shows up top in spectrum
@@ -19,37 +24,31 @@ export const categories = pageData.catalog.categories
   .map(({ CATEGORY_NAME }) => CATEGORY_NAME.toLowerCase());
 
 // Pull out all products
-const allProducts = [];
-pageData.catalog.categories.forEach(cat => {
+const allProducts = pageData.catalog.categories.reduce((acc, cat) => {
   // Specifically for starters, extract since has FRAGRANCE_FAMILY key needed
   if (cat.CATEGORY_ID === COMBO_CAT) {
-    cat.products.forEach(starterProd => allProducts.push(starterProd));
-    return true;
+    acc.push(...cat.products);
+    return acc;
   }
   // Bail if no children
-  if (!cat.children || !cat.children.length) {
-    return false;
+  if (!cat.children) {
+    return acc;
   }
   // Get everything else
   cat.children.forEach(catChild => {
-    catChild.products.forEach(childProd => {
-      // Is this product even in our list of combiner products from drupal
-      if (
-        // If not in original drupal list of prods to care about
-        !combiners.some(id => id === childProd.PRODUCT_ID) ||
-        // If not already in list
-        !allProducts.some(
-          ({ PRODUCT_ID }) => PRODUCT_ID === childProd.PRODUCT_ID
-        )
-      ) {
-        return false;
-      }
-      allProducts.push(childProd);
-      return true;
-    });
+    const catProducts = catChild.products.filter(
+      childProd =>
+        // If in original drupal list of prods to care about
+        combiners.some(id => id === childProd.PRODUCT_ID) &&
+        // And not already in list
+        !acc.some(({ PRODUCT_ID }) => PRODUCT_ID === childProd.PRODUCT_ID)
+    );
+    acc.push(...catProducts);
   });
-  return true;
-});
+
+  return acc;
+}, []);
+console.log(allProducts);
 
 export const fragrances = Object.values(drupalData).map(
   (
