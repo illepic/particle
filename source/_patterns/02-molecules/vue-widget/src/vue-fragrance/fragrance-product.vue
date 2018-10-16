@@ -2,11 +2,13 @@
   <div class="fragrance-full text-center">
     <div>
       <img
-        :src="`${imgBase}${product.img.combiner}`"
+        :src="product.img.combiner"
         :alt="product.names.short"
       >
     </div>
-    <p class="text-uppercase bold"><strong>{{ product.names.long }}</strong></p>
+    <p class="text-uppercase bold">
+      <strong>{{ product.names.long }}</strong>
+    </p>
     <p class="text-capitalize">{{ product.cat }}</p>
     <p>
       <span
@@ -17,7 +19,10 @@
         {{ cost }} {{ size }}
       </span>
     </p>
-    <button class="btn btn-primary text-uppercase">Shop now</button>
+    <a 
+      class="btn btn-primary text-uppercase" 
+      href="#"
+    >Shop now</a>
   </div>
 </template>
 <script>
@@ -34,9 +39,7 @@ export default {
     },
   },
   data() {
-    return {
-      imgBase: 'https://www.jomalone.com',
-    };
+    return {};
   },
 };
 </script>

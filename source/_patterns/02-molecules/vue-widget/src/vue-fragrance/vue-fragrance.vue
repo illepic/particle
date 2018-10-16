@@ -15,11 +15,11 @@
           <div
             v-for="fragrance in category.fragrances"
             :key="fragrance.id"
-            :style="{backgroundImage: `url(${imgBase}${ fragrance.img.spectrum})`}"
+            :style="{backgroundImage: `url(${fragrance.img.spectrum})`}"
             class="spectrum-category__image h-100"
             :class="{highlighted: fragrance.id === highlightedId, chosen: fragrance.id === chosenId}"
             @mouseover="highlightedId = fragrance.id"
-            @click="choose(fragrance.id)"
+            @click="chosenId = fragrance.id"
           />
         </div>
 
@@ -37,7 +37,7 @@
             :key="fragrance.id"
             :class="{highlighted: fragrance.id === highlightedId, chosen: fragrance.id === chosenId}"
             @mouseover="highlightedId = fragrance.id"
-            @click="choose(fragrance.id)"
+            @click="chosenId = fragrance.id"
           >
             {{ fragrance.names.short }}
           </li>
@@ -50,14 +50,14 @@
       <div class="row justify-content-center">
         <form>
           <div class="form-row align-items-center">
-            <div class="col-auto my-1">Make it</div>
-            <div class="col-auto my-1">
+            <div class="col-auto">Make it</div>
+            <div class="col-auto">
               <label
                 class="mr-sm-2 sr-only"
-                for="inlineFormCustomSelect"
+                for="companionSelect"
               >Select companion fragrance</label>
               <select
-                id="inlineFormCustomSelect"
+                id="companionSelect"
                 v-model="companion"
                 class="custom-select mr-2"
               >
@@ -102,8 +102,7 @@ export default {
     return {
       fragrances,
       categories,
-      imgBase: 'https://www.jomalone.com',
-      companion: 'warmer',
+      companion: null,
       highlightedId: null,
       chosenId: null,
     };
@@ -139,16 +138,16 @@ export default {
       );
     },
   },
+  watch: {
+    // Always reset companion to warmer when choosing new ID
+    chosenId() {
+      this.companion = 'warmer';
+    },
+  },
   created() {
     const first = this.spectrum[0].fragrances[0].id;
     this.highlightedId = first;
     this.chosenId = first;
-  },
-  methods: {
-    choose(id) {
-      this.companion = 'warmer';
-      this.chosenId = id;
-    },
   },
 };
 </script>
